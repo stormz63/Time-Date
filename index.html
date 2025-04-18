@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Current Date & Time</title>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">TimeNow</div>
+    <nav class="nav-buttons">
+      <a href="register.html">
+        <button>Register</button>
+      </a>
+      <a href="dashboard.html" target="_blank">
+        <button>Dashboard</button>
+      </a>
+      <a href="home.html">
+        <button id="homeBtn">Home</button>
+      </a>
+
+      <button id="worldBtn">World Time</button>
+      <button id="settingsBtn">Settings</button>
+      <a href="contact.html" target="_blank">
+        <button>Contact</button>
+      </a>
+      <div><strong>Your Location:</strong> <span id="location"></span></div>
+    </nav>
+  </header>
+
+  <div class="container" id="main">
+    <div class="datetime">
+      <div><strong>Date:</strong> <span id="date"></span></div>
+      <div><strong>Time:</strong> <span id="time"></span></div>
+    </div>
+  </div>
+
+  <div id="worldModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>World Time</h2>
+      <ul id="worldTimes"></ul>
+    </div>
+  </div>
+
+
+  <script>
+const dateElement = document.getElementById('date');
+const timeElement = document.getElementById('time');
+const locationElement = document.getElementById('location');
+const worldBtn = document.getElementById('worldBtn');
+const settingsBtn = document.getElementById('settingsBtn');
+const modal = document.getElementById('worldModal');
+const closeModalBtn = document.querySelector('.close-btn');
+const worldTimesList = document.getElementById('worldTimes');
+
+function updateDateTime() {
+  const now = new Date();
+  const options = { month: 'long', day: 'numeric', year: 'numeric' };
+  dateElement.textContent = now.toLocaleDateString('en-US', options);
+  timeElement.textContent = now.toLocaleTimeString();
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      locationElement.textContent = `Lat: ${position.coords.latitude.toFixed(2)}, Lon: ${position.coords.longitude.toFixed(2)}`;
+    },
+    (error) => {
+      locationElement.textContent = "Location access denied";
+    }
+  );
+} else {
+  locationElement.textContent = "Geolocation not supported";
+}
+
+worldBtn.addEventListener('click', () => {
+  modal.classList.remove('hidden');
+  populateWorldTime();
+});
+
+closeModalBtn.addEventListener('click', () => {
+  modal.classList.add('hidden');
+});
+
+function populateWorldTime() {
+  const cities = ['New York', 'London', 'Tokyo', 'Sydney'];
+  worldTimesList.innerHTML = '';
+  cities.forEach((city) => {
+    const li = document.createElement('li');
+    const time = new Date().toLocaleString('en-US', { timeZone: getTimeZone(city) });
+    li.textContent = `${city}: ${time}`;
+    worldTimesList.appendChild(li);
+  });
+}
+
+function getTimeZone(city) {
+  const timeZones = {
+    'New York': 'America/New_York',
+    'London': 'Europe/London',
+    'Tokyo': 'Asia/Tokyo',
+    'Sydney': 'Australia/Sydney',
+  };
+  return timeZones[city] || 'UTC';
+}
+
+  </script>
+  <script src="/Backend/JavaScript/script.js"></script>
+</body>
+</html>
