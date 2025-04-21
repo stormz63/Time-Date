@@ -10,14 +10,12 @@
   <header>
     <h2>Login</h2>
     <div class="nav-buttons">
-      <a href="home.html">
-        <button>Home</button>
-      </a>
+      <a href="home.html"><button>Home</button></a>
     </div>
   </header>
 
   <div class="container">
-    <h2>Login</h2>
+    <h2>Log In</h2>
     <form id="login-form">
       <div>
         <input type="email" id="email" placeholder="Email" required class="register-input"/>
@@ -53,18 +51,18 @@
           })
         });
 
-        const text = await response.text(); // Read raw response
+        const text = await response.text();
         let data = {};
         try {
-          data = JSON.parse(text); // Try to parse JSON
+          data = JSON.parse(text);
         } catch (err) {
-          console.warn('Server response is not JSON:', text);
+          console.warn('Non-JSON response:', text);
         }
 
         if (response.ok) {
           const token = data.access_token;
           message.textContent = `✅ Welcome back, ${email}! You are logged in.`;
-          console.log('✅ JWT Access Token:', token);
+          console.log('✅ JWT Token:', token);
           loginForm.reset();
         } else {
           throw new Error(data.error_description || 'Login failed');
