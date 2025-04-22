@@ -10,6 +10,11 @@
 <body>
   <header>
     <h2>TimeNow</h2>
+    <div class="nav-buttons">
+      <a href="home.html">
+        <button>Home</button>
+      </a>
+    </div>
   </header>
 
   <div class="container">
@@ -21,6 +26,48 @@
     </div>
   </div>
 
-  <script src="/Backend/JavaScript/netlify.js"></script>
+  <script>
+    netlifyIdentity.on("init", (user) => {
+      updateUI(user)
+    });
+
+    netlifyIdentity.on("login", (user) => {
+      updateUI(user)
+      netlifyIdentity.close()
+      if (window.location.hash === "#") {
+        history.replaceState(null, "", window.location.pathname);
+      }
+    });
+
+    netlifyIdentity.on("logout", () => {
+      updateUI(null)
+    });
+
+    document.getElementById("login-btn").addEventListener("click", () => {
+      netlifyIdentity.open();
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      netlifyIdentity.logout();
+    });
+
+    function updateUI(user) {
+      const greeting = document.getElementById("user-greeting");
+      const loginBtn = document.getElementById("login-btn");
+      const logoutBtn = document.getElementById("logout-btn");
+
+      if (user) {
+        greeting.innerHTML = `Welcome, <strong>${user.user_metadata.full_name || user.email}</strong>`;
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+      } else {
+        greeting.innerHTML = "";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+      }
+    }
+
+    netlifyIdentity.init();
+  </script>
 </body>
 </html>
