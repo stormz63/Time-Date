@@ -1,44 +1,113 @@
+netlifyIdentity.on("init", user => {
+  updateUI(user);
+});
 
-    netlifyIdentity.on('init', user => {
-      updateUI(user)
-    })
+netlifyIdentity.on("login", user => {
+  updateUI(user);
+  netlifyIdentity.close();
+  if (window.location.hash === "#") {
+    history.replaceState(null, "", window.location.pathname);
+  }
+});
 
-    netlifyIdentity.on('login', user => {
-      updateUI(user)
-      netlifyIdentity.close()
+netlifyIdentity.on("logout", () => {
+  updateUI(null);
+});
 
-      if (window.location.hash == '#')
-      {
-        history.replaceState(null, '', window.location.pathname)
-      }
-    })
+document.getElementById("login-btn").addEventListener("click", () => {
+  netlifyIdentity.open();
+});
 
-    netlifyIdentity.on('logout', () => {
-      updateUI(null)
-    })
+document.getElementById("logout-btn").addEventListener("click", () => {
+  netlifyIdentity.logout();
+});
 
-    function updateUI(user) {
-      const userInfo = document.getElementById('user-info')
-      const adminPanel = document.getElementById('admin-panel')
+function updateUI(user) {
+  const greeting = document.getElementById("user-greeting");
+  const loginBtn = document.getElementById("login-btn");
+  const logoutBtn = document.getElementById("logout-btn");
 
-      if (user) {
-        const roles = user.app_metadata.roles || []
-        const isAdmin = roles.includes('admin')
+  const isAdmin = user?.app_metadata?.roles?.includes("admin");
 
-        userInfo.innerHTML = `
-          <p>Welcome, <strong>${user.user_metadata.full_name || user.email}</strong></p>
-          <button onclick="netlifyIdentity.logout()">Logout</button>
-        `
+  if (user) {
+    greeting.innerHTML = `Welcome, <strong>${user.user_metadata.full_name || user.email}</strong>`;
 
-        if (isAdmin) {
-          adminPanel.style.display = 'block'
-        } else {
-          adminPanel.style.display = 'none'
-        }
-      } else {
-        userInfo.innerHTML = ''
-        adminPanel.style.display = 'none'
-      }
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+
+    if (isAdmin) {
+      loadAdminPanel();
     }
+  } else {
+    greeting.innerHTML = "";
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    hideAdminPanel();
+  }
+}
 
-    netlifyIdentity.init()
+function loadAdminPanel() {
+  const container = document.querySelector(".container");
+
+  if (document.getElementById("admin-panel")) return;
+
+  const adminPanel = document.createElement("div");
+  adminPanel.id = "admin-panel";
+  adminPanel.innerHTML = `
+    <h3>Admin Panel</h3>
+    <button onclick="fetchUsers()">View Users</button>
+    <button onclick="viewAnalytics()">View Analytics</button>
+    <button onclick="viewActivityLogs()">View Activity Logs</button>
+    <div id="users-output" style="margin-top:1rem;"></div>
+    <div id="analytics-output" style="margin-top:1rem;"></div>
+    <div id="logs-output" style="margin-top:1rem;"></div>
+  `;
+
+  container.appendChild(adminPanel);
+}
+
+function hideAdminPanel() {
+  const panel = document.getElementById("admin-panel");
+  if (panel) panel.remove();
+}
+
+async function fetchUsers() {
+  const output = document.getElementById("users-output");
+  output.innerHTML = "Loading users...";
+
+  const users = [
+    { id: "123", email: "user1@example.com" },
+    { id: "456", email: "user2@example.com" }
+  ];
+
+  output.innerHTML = users.map(user =>
+    `<div>
+      ${user.email}
+      <button onclick="deleteUser('${user.id}')">Delete</button>
+    </div>`
+  ).join("");
+}
+
+async function deleteUser(userId) {
+  if (!confirm("Are you sure you want to delete this user?")) return;
+
+  alert(`User ${userId} deleted (mock response).`);
+  fetchUsers();
+}
+
+async function viewAnalytics() {
+  const output = document.getElementById("analytics-output");
+  output.innerHTML = "Site Analytics (example only):<br><ul>" +
+    "<li>Total visits: 1,234</li>" +
+    "<li>Top page: /dashboard</li>" +
+    "<li>Active users: 32</li>" +
+    "</ul>";
+}
+
+async function viewActivityLogs() {
+  const output = document.getElementById("logs-output");
+  output.innerHTML = "Activity Logs (example):<br><ul>" +
+    "<li>[10:23am] user1@example.com logged in</li>" +
+    "<li>[10:25am] user2@example.com deleted a record</li>" +
+    "</ul>";
+}
