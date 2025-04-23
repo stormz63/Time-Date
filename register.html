@@ -26,53 +26,6 @@
     </div>
   </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    if (window.location.hash === "#") {
-      history.replaceState(null, "", window.location.pathname);
-    }
 
-    const loginBtn = document.getElementById("login-btn");
-    const logoutBtn = document.getElementById("logout-btn");
-    const greeting = document.getElementById("user-greeting");
-
-    function updateUI(user) {
-      if (!loginBtn || !logoutBtn || !greeting) return;
-
-      if (user) {
-        greeting.innerHTML = `Welcome, <strong>${user.user_metadata.full_name || user.email}</strong>`;
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-      } else {
-        greeting.innerHTML = "";
-        loginBtn.style.display = "inline-block";
-        logoutBtn.style.display = "none";
-      }
-    }
-
-    netlifyIdentity.on("init", user => {
-      updateUI(user);
-    });
-
-    netlifyIdentity.on("login", user => {
-      updateUI(user);
-      netlifyIdentity.close();
-    });
-
-    netlifyIdentity.on("logout", () => {
-      updateUI(null);
-    });
-
-    loginBtn?.addEventListener("click", () => {
-      netlifyIdentity.open("login");
-    });
-
-    logoutBtn?.addEventListener("click", () => {
-      netlifyIdentity.logout();
-    });
-
-    netlifyIdentity.init();
-  });
-</script>
 </body>
 </html>
