@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Timer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h2>Timer</h2>
+    <div class="nav-buttons"></div>
+    <a href="home.html">
+        <button>Home</button>
+    </a>
+  </header>
+  
+  <label for="secondsInput">Set seconds:</label>
+  <input type="number" id="secondsInput" min="1">
+  <button onclick="startTimer()">Start Timer</button>
+
+  <h2 id="countdownDisplay">Waiting</h2>
+
+  <script>
+    function startTimer() {
+      let timeLeft = parseInt(document.getElementById('secondsInput').value);
+      const display = document.getElementById('countdownDisplay');
+
+      if (isNaN(timeLeft) || timeLeft <= 0) {
+        display.textContent = "Please enter a valid number";
+        return;
+      }
+
+      display.textContent = timeLeft;
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        display.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          display.textContent = "Time's up";
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

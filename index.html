@@ -8,26 +8,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body style="margin:0; padding:0; font-family: 'Poppins', sans-serif; min-height:100vh; display:flex; flex-direction:column;">
+<body>
 
-  <header style="padding: 15px; background-color: #0f2027; color: white;">
+  <header style="padding: 15px 30px; background-color: #0f2027; color: white; display: flex; justify-content: space-between; align-items: center;">
     <div class="logo">TimeNow</div>
-    <nav class="nav-buttons">
-      <a href="register.html"><button>Register</button></a>
-      <a href="dashboard.html" target="_blank"><button>Dashboard</button></a>
-      <a href="home.html"><button id="homeBtn">Home</button></a>
+    
+    <nav class="nav-buttons" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+      <div class="nav1">
+      <a href="home.html"><button>Home</button></a>
       <button id="settingsBtn">24 Hour Time</button>
-      <a href="contact.html" target="_blank"><button>Contact</button></a>
-      <div><strong>Your Location:</strong> <span id="location"></span></div>
+      <button id="worldBtn">World Time</button>
+
+      <div class="dropdown">
+        <button class="dropdown-button">Tools</button>
+        <div class="dropdown-content">
+          <a href="stopwatch.html">Stopwatch</a>
+          <a href="timer.html">Timer</a>
+          <a href="calendar.html">Calendar</a>
+        </div>
+      </div>
+
+      
+      <div class="dropdown">
+        <button class="dropdown-button">Account</button>
+        <div class="dropdown-content">
+          <a href="register.html">Register</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="contact.html">Contact</a>
+          <a href="admin_panel.html">Admin Login</a>
+        </div>
+      </div>
+      </div>
     </nav>
   </header>
 
-  <div style="flex:1;">
-    <div id="main" style="padding: 20px; text-align: center;">
+  <div class="container">
+    <div id="main">
+      <h1 style="margin-bottom: 20px; margin: 20px;">Current Date & Time</h1>
+      <hr>
       <div class="datetime">
         <div><strong>Date:</strong> <span id="date"></span></div>
         <div><strong>Time:</strong> <span id="time"></span></div>
       </div>
+      <div class="location"><strong>Your Location:</strong> <span id="location"></span></div>
     </div>
 
     <div id="worldModal" class="modal hidden">
@@ -39,75 +62,6 @@
     </div>
   </div>
 
-  <footer style="padding: 20px; background-color: #0f2027; color: white; text-align:center;">
-    <a href="admin_panel.html" style="color: gray;">Admin Login</a>
-  </footer>
-
-  <script>
-    const dateElement = document.getElementById('date');
-    const timeElement = document.getElementById('time');
-    const locationElement = document.getElementById('location');
-    const worldBtn = document.getElementById('worldBtn');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const modal = document.getElementById('worldModal');
-    const closeModalBtn = document.querySelector('.close-btn');
-    const worldTimesList = document.getElementById('worldTimes');
-
-    function updateDateTime() {
-      const now = new Date();
-      const options = { month: 'long', day: 'numeric', year: 'numeric' };
-      dateElement.textContent = now.toLocaleDateString('en-US', options);
-      timeElement.textContent = now.toLocaleTimeString();
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          locationElement.textContent = `Lat: ${position.coords.latitude.toFixed(2)}, Lon: ${position.coords.longitude.toFixed(2)}`;
-        },
-        () => {
-          locationElement.textContent = "Location access denied";
-        }
-      );
-    } else {
-      locationElement.textContent = "Geolocation not supported";
-    }
-
-    if (worldBtn) {
-      worldBtn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-        populateWorldTime();
-      });
-    }
-
-    if (closeModalBtn) {
-      closeModalBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-      });
-    }
-
-    function populateWorldTime() {
-      const cities = ['New York', 'London', 'Tokyo', 'Sydney'];
-      worldTimesList.innerHTML = '';
-      cities.forEach((city) => {
-        const li = document.createElement('li');
-        const time = new Date().toLocaleString('en-US', { timeZone: getTimeZone(city) });
-        li.textContent = `${city}: ${time}`;
-        worldTimesList.appendChild(li);
-      });
-    }
-
-    function getTimeZone(city) {
-      const timeZones = {
-        'New York': 'America/New_York',
-        'London': 'Europe/London',
-        'Tokyo': 'Asia/Tokyo',
-        'Sydney': 'Australia/Sydney',
-      };
-      return timeZones[city] || 'UTC';
-    }
-  </script>
+  <script src="/Backend/JavaScript/index.js"></script>
 </body>
 </html>
