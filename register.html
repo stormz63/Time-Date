@@ -3,31 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign up or Login</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
+      authDomain: "timeapp-1b0ec.firebaseapp.com",
+      projectId: "timeapp-1b0ec",
+      storageBucket: "timeapp-1b0ec.firebasestorage.app",
+      messagingSenderId: "691836486540",
+      appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+
+    window.handleSignUp = async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const displayName = document.getElementById("username").value;
+      const message = document.getElementById("message");
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCred.user, { displayName });
+        message.textContent = "Sign up successful! You can now log in.";
+        message.style.color = "#00ffae";
+      } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "#f44336";
+      }
+    };
+  </script>
 </head>
 <body>
   <header>
-    <h2>TimeNow</h2>
+    <h2>Create an Account</h2>
     <div class="nav-buttons">
       <a href="home.html">
         <button>Home</button>
       </a>
     </div>
   </header>
-
-  <h1>Register and Login wont be working for a while</h1>
-  <h2>Working on updates</h2>
-  <div class="container">
-    <h2>Sign up or Login</h2>
-    <div id="user-greeting" style="margin-top: 1rem;"></div>
-    <div>
-      <button id="login-btn">Log In / Sign Up</button>
-      <button id="logout-btn" style="display: none;">Log Out</button>
+  <form onsubmit="handleSignUp(event)">
+    <div class="container">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password (min 6 characters)" required />
+      <div class="message" id="message"></div>
+      <button type="submit">Sign Up</button>
+      <div>
+        <label>Already have an account? <a href="login.html">Login</a></label>
+      </div>
     </div>
-  </div>
-
-
+  </form>
 </body>
 </html>

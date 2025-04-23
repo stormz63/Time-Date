@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Realtime Chat</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
+      authDomain: "timeapp-1b0ec.firebaseapp.com",
+      databaseURL: "https://timeapp-1b0ec-default-rtdb.firebaseio.com",
+      projectId: "timeapp-1b0ec",
+      storageBucket: "timeapp-1b0ec.firebasestorage.app",
+      messagingSenderId: "691836486540",
+      appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, 'messages');
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      })[tag]);
+    }
+
+    function renderMessage(id, msg) {
+      const div = document.createElement('div');
+      div.className = 'message';
+
+      const meta = document.createElement('div');
+      meta.className = 'username';
+      meta.textContent = msg.username;
+      div.appendChild(meta);
+
+      const text = document.createElement('div');
+      text.className = 'content';
+      text.textContent = msg.message;
+      div.appendChild(text);
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Delete';
+      delBtn.onclick = () => {
+        if (confirm("Delete this message?")) {
+          remove(ref(db, 'messages/' + id));
+        }
+      };
+      div.appendChild(delBtn);
+
+      return div;
+    }
+
+    function loadMessages() {
+      onValue(messagesRef, snapshot => {
+        const data = snapshot.val();
+        const container = document.getElementById('messagesContainer');
+        container.innerHTML = '';
+        if (data) {
+          Object.entries(data).forEach(([id, msg]) => {
+            container.appendChild(renderMessage(id, msg));
+          });
+          setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+          }, 100);
+        }
+      });
+    }
+
+    window.handleSubmit = function(e) {
+      e.preventDefault();
+      const username = escapeHTML(document.getElementById('username').value.trim());
+      const message = escapeHTML(document.getElementById('message').value.trim());
+      if (!username || !message) return;
+
+      push(messagesRef, {
+        username,
+        message,
+        timestamp: Date.now()
+      });
+
+      document.getElementById('postForm').reset();
+    };
+
+    loadMessages();
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #121212;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 10px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, textarea {
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #2c5364;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    #messagesContainer {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+      background: #1f1f1f;
+      border-radius: 8px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      background: #2c2c2c;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .username {
+      font-weight: bold;
+      color: #00adb5;
+      margin-bottom: 3px;
+    }
+
+    .content {
+      white-space: pre-wrap;
+    }
+
+    .message button {
+      margin-top: 5px;
+      background-color: #e74c3c;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .message button:hover {
+      background-color: #c0392b;
+    }
+
+    header{
+        width: 100%;
+        background-color: #0f2027;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+    <header>
+        <h2>Chat Room</h2>
+        <div class="nav-buttons">
+            <a href="home.html">
+                <button>Home</button>
+            </a>
+        </div>
+    </header>
+  <form id="postForm" onsubmit="handleSubmit(event)">
+    <input type="text" id="username" placeholder="Enter your name" required />
+    <textarea id="message" rows="2" placeholder="Type a message..." required></textarea>
+    <button type="submit">Send</button>
+  </form>
+  <div id="messagesContainer"></div>
+</body>
+</html>

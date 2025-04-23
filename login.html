@@ -4,74 +4,64 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
+      authDomain: "timeapp-1b0ec.firebaseapp.com",
+      projectId: "timeapp-1b0ec",
+      storageBucket: "timeapp-1b0ec.firebasestorage.app",
+      messagingSenderId: "691836486540",
+      appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+
+    window.handleLogin = async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        message.textContent = "Login successful!";
+        message.style.color = "#00ffae";
+
+      } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "#f44336";
+      }
+    };
+  </script>
 </head>
 <body>
   <header>
     <h2>Login</h2>
     <div class="nav-buttons">
-      <a href="home.html"><button>Home</button></a>
+        <a href="home.html">
+            <button>Home</button>
+        </a>
     </div>
   </header>
-
-  <div class="container">
-    <h2>Log In</h2>
-    <form id="login-form">
-      <div>
-        <input type="email" id="email" placeholder="Email" required class="register-input"/>
+  <form onsubmit="handleLogin(event)">
+    <div class="container">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <div class="message" id="message"></div>
+        <button type="submit">Login</button>
+        <div>
+            <label>Don't have an account? <a href="register.html">Sign Up</a></label>
       </div>
-      <div>
-        <input type="password" id="password" placeholder="Password" required class="register-input"/>
-      </div>
-      <button type="submit">Log In</button>
-    </form>
-    <p>Don't have an account? <a href="Register.html">Register</a></p>
-  </div>
-
-  <div id="message"></div>
-
-  <script>
-    const loginForm = document.getElementById('login-form');
-    const message = document.getElementById('message');
-
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      try {
-        const response = await fetch('/.netlify/identity/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            grant_type: 'password',
-            username: email,
-            password: password
-          })
-        });
-
-        const text = await response.text();
-        let data = {};
-        try {
-          data = JSON.parse(text);
-        } catch (err) {
-          console.warn('Non-JSON response:', text);
-        }
-
-        if (response.ok) {
-          const token = data.access_token;
-          message.textContent = `✅ Welcome back, ${email}! You are logged in.`;
-          console.log('✅ JWT Token:', token);
-          loginForm.reset();
-        } else {
-          throw new Error(data.error_description || 'Login failed');
-        }
-      } catch (err) {
-        console.error('❌ Login Error:', err.message);
-        message.textContent = `❌ Error: ${err.message}`;
-      }
-    });
-  </script>
+    </div>
+  </form>
 </body>
 </html>
