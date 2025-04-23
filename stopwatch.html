@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>StopWatch</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style.css"/>
+  <title>Stopwatch</title>
 </head>
 <body>
-    <header>
-        <h2>StopWatch</h2>
-        <div>
-            <a href="home.html">
-                <button>Home</button>
-            </a>
-        </div>
-    </header>
-    <div class="container">
-        <div id="display" class="display">00:00:00</div>
-
-        <button id="start">Start</button>
-        <button id="stop">Stop</button>
-        <button id="reset">Reset</button>
-
-        <script src="/Backend/JavaScript/stopwatch.js"></script>
+  <header>
+    <h1>Stopwatch</h1>
+    <div class="nav-buttons">
+        <a href="home.html">
+            <button>Home</button>
+        </a>
     </div>
+  </header>
+
+  <main class="container">
+    <div id="display" class="display">00:00:00</div>
+    <div class="buttons">
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+      <button id="reset">Reset</button>
+    </div>
+  </main>
+
+  <script src="/Backend/JavaScript/stopwatch.js"></script>
 </body>
 </html>
