@@ -3,22 +3,27 @@ netlifyIdentity.on('init', user => {
   const logoutBtn = document.getElementById('logout-btn');
   const userGreeting = document.getElementById('user-greeting');
 
-  if (user) {
-    loginBtn.style.display = 'none';
-    logoutBtn.style.display = 'inline-block';
-    userGreeting.textContent = 'Logged in as ' + user.email;
-  } else {
-    loginBtn.style.display = 'inline-block';
-    logoutBtn.style.display = 'none';
-    userGreeting.textContent = '';
+  function updateUI(user) {
+    if (user) {
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = 'inline-block';
+      userGreeting.textContent = 'Logged in as ' + user.email;
+    } else {
+      loginBtn.style.display = 'inline-block';
+      logoutBtn.style.display = 'none';
+      userGreeting.textContent = '';
+    }
   }
 
-  netlifyIdentity.on('login', () => {
-    location.reload();
+  updateUI(user);
+
+  netlifyIdentity.on('login', user => {
+    updateUI(user);
+    netlifyIdentity.close();
   });
 
   netlifyIdentity.on('logout', () => {
-    location.reload();
+    updateUI(null);
   });
 });
 
