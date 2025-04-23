@@ -1,1 +1,64 @@
-function _0x5877(){const _0x2c7707=['1138686KNuGZO','UTC','add','1438566QftRnB','en-US','remove','createElement','worldModal','21GvxcCx','toFixed','classList','longitude','52880VlvDNT','settingsBtn','hidden','appendChild','8009960vSzXha','1415950qcJrIS','471676ZHqxWL','Australia/Sydney','querySelector','click','addEventListener','72MttnWu','2133090smDJzz','Location\x20access\x20denied','latitude','Sydney','Asia/Tokyo','395zZfGEk','toLocaleString','.close-btn','toLocaleTimeString','textContent','getElementById','coords','New\x20York','time','London','forEach','Europe/London','Lat:\x20','toLocaleDateString','Tokyo','innerHTML'];_0x5877=function(){return _0x2c7707;};return _0x5877();}const _0xd97112=_0x5766;(function(_0x54f12c,_0x41c17c){const _0xa158e6=_0x5766,_0x183281=_0x54f12c();while(!![]){try{const _0x4ffd2f=-parseInt(_0xa158e6(0x153))/0x1+parseInt(_0xa158e6(0x159))/0x2+-parseInt(_0xa158e6(0x171))/0x3+parseInt(_0xa158e6(0x17a))/0x4*(-parseInt(_0xa158e6(0x15e))/0x5)+-parseInt(_0xa158e6(0x16e))/0x6*(parseInt(_0xa158e6(0x176))/0x7)+parseInt(_0xa158e6(0x151))/0x8+-parseInt(_0xa158e6(0x158))/0x9*(-parseInt(_0xa158e6(0x152))/0xa);if(_0x4ffd2f===_0x41c17c)break;else _0x183281['push'](_0x183281['shift']());}catch(_0x58eba9){_0x183281['push'](_0x183281['shift']());}}}(_0x5877,0x9b2ed));const dateElement=document[_0xd97112(0x163)]('date'),timeElement=document[_0xd97112(0x163)](_0xd97112(0x166)),locationElement=document[_0xd97112(0x163)]('location'),worldBtn=document['getElementById']('worldBtn'),settingsBtn=document['getElementById'](_0xd97112(0x17b)),modal=document['getElementById'](_0xd97112(0x175)),closeModalBtn=document[_0xd97112(0x155)](_0xd97112(0x160)),worldTimesList=document['getElementById']('worldTimes');function updateDateTime(){const _0x1c7105=_0xd97112,_0x1d9cb9=new Date(),_0x100a32={'month':'long','day':'numeric','year':'numeric'};dateElement[_0x1c7105(0x162)]=_0x1d9cb9[_0x1c7105(0x16b)]('en-US',_0x100a32),timeElement[_0x1c7105(0x162)]=_0x1d9cb9[_0x1c7105(0x161)]();}setInterval(updateDateTime,0x3e8),updateDateTime();function _0x5766(_0x2f017d,_0x4716c9){const _0x587730=_0x5877();return _0x5766=function(_0x576647,_0x10ec94){_0x576647=_0x576647-0x150;let _0x36bb1c=_0x587730[_0x576647];return _0x36bb1c;},_0x5766(_0x2f017d,_0x4716c9);}navigator['geolocation']?navigator['geolocation']['getCurrentPosition'](_0xee9ccb=>{const _0xe1ebfd=_0xd97112;locationElement[_0xe1ebfd(0x162)]=_0xe1ebfd(0x16a)+_0xee9ccb[_0xe1ebfd(0x164)][_0xe1ebfd(0x15b)][_0xe1ebfd(0x177)](0x2)+',\x20Lon:\x20'+_0xee9ccb[_0xe1ebfd(0x164)][_0xe1ebfd(0x179)]['toFixed'](0x2);},()=>{const _0x149bfb=_0xd97112;locationElement[_0x149bfb(0x162)]=_0x149bfb(0x15a);}):locationElement[_0xd97112(0x162)]='Geolocation\x20not\x20supported';worldBtn&&worldBtn[_0xd97112(0x157)](_0xd97112(0x156),()=>{const _0x95969=_0xd97112;modal[_0x95969(0x178)][_0x95969(0x173)](_0x95969(0x17c)),populateWorldTime();});closeModalBtn&&closeModalBtn[_0xd97112(0x157)]('click',()=>{const _0x17be7a=_0xd97112;modal[_0x17be7a(0x178)][_0x17be7a(0x170)](_0x17be7a(0x17c));});function populateWorldTime(){const _0x32d921=_0xd97112,_0x4a97e0=[_0x32d921(0x165),_0x32d921(0x167),_0x32d921(0x16c),_0x32d921(0x15c)];worldTimesList[_0x32d921(0x16d)]='',_0x4a97e0[_0x32d921(0x168)](_0x1f8116=>{const _0x4497f6=_0x32d921,_0x1aed74=document[_0x4497f6(0x174)]('li'),_0x7d1fc5=new Date()[_0x4497f6(0x15f)](_0x4497f6(0x172),{'timeZone':getTimeZone(_0x1f8116)});_0x1aed74[_0x4497f6(0x162)]=_0x1f8116+':\x20'+_0x7d1fc5,worldTimesList[_0x4497f6(0x150)](_0x1aed74);});}function getTimeZone(_0x5c424a){const _0x4b26f3=_0xd97112,_0x1f45a8={'New\x20York':'America/New_York','London':_0x4b26f3(0x169),'Tokyo':_0x4b26f3(0x15d),'Sydney':_0x4b26f3(0x154)};return _0x1f45a8[_0x5c424a]||_0x4b26f3(0x16f);}
+    const dateElement = document.getElementById('date');
+    const timeElement = document.getElementById('time');
+    const locationElement = document.getElementById('location');
+    const worldBtn = document.getElementById('worldBtn');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const modal = document.getElementById('worldModal');
+    const closeModalBtn = document.querySelector('.close-btn');
+    const worldTimesList = document.getElementById('worldTimes');
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { month: 'long', day: 'numeric', year: 'numeric' };
+      dateElement.textContent = now.toLocaleDateString('en-US', options);
+      timeElement.textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          locationElement.textContent = `Lat: ${position.coords.latitude.toFixed(2)}, Lon: ${position.coords.longitude.toFixed(2)}`;
+        },
+        () => {
+          locationElement.textContent = "Location access denied";
+        }
+      );
+    } else {
+      locationElement.textContent = "Geolocation not supported";
+    }
+
+    if (worldBtn) {
+      worldBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        populateWorldTime();
+      });
+    }
+
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+      });
+    }
+
+    function populateWorldTime() {
+      const cities = ['New York', 'London', 'Tokyo', 'Sydney'];
+      worldTimesList.innerHTML = '';
+      cities.forEach((city) => {
+        const li = document.createElement('li');
+        const time = new Date().toLocaleString('en-US', { timeZone: getTimeZone(city) });
+        li.textContent = `${city}: ${time}`;
+        worldTimesList.appendChild(li);
+      });
+    }
+
+    function getTimeZone(city) {
+      const timeZones = {
+        'New York': 'America/New_York',
+        'London': 'Europe/London',
+        'Tokyo': 'Asia/Tokyo',
+        'Sydney': 'Australia/Sydney',
+      };
+      return timeZones[city] || 'UTC';
+    }

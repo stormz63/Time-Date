@@ -1,1 +1,38 @@
-const _0x5de138=_0x3934;function _0x4555(){const _0xf5326c=['2391214SDAemi','init','login-btn','close','376866HeOhmf','47jNQXzb','750356qgebeW','block','addEventListener','logout-btn','click','open','none','style','classList','logout','65bYoenA','6510480QNYQRa','remove','27210JbJcuR','hidden','getElementById','1917759WDRBEN','display','2732418NNJKyj','add'];_0x4555=function(){return _0xf5326c;};return _0x4555();}(function(_0x261225,_0x40632a){const _0x58a066=_0x3934,_0x188e95=_0x261225();while(!![]){try{const _0x2d1d3a=-parseInt(_0x58a066(0x13c))/0x1*(parseInt(_0x58a066(0x130))/0x2)+-parseInt(_0x58a066(0x133))/0x3+parseInt(_0x58a066(0x13d))/0x4+-parseInt(_0x58a066(0x12d))/0x5*(-parseInt(_0x58a066(0x13b))/0x6)+-parseInt(_0x58a066(0x137))/0x7+parseInt(_0x58a066(0x12e))/0x8+parseInt(_0x58a066(0x135))/0x9;if(_0x2d1d3a===_0x40632a)break;else _0x188e95['push'](_0x188e95['shift']());}catch(_0x16a644){_0x188e95['push'](_0x188e95['shift']());}}}(_0x4555,0x7a606),netlifyIdentity['init']());const loginBtn=document[_0x5de138(0x132)](_0x5de138(0x139)),logoutBtn=document['getElementById'](_0x5de138(0x140)),dashboard=document[_0x5de138(0x132)]('dashboard');function _0x3934(_0x29e4cb,_0x79309){const _0x4555bb=_0x4555();return _0x3934=function(_0x3934c3,_0x2f8b16){_0x3934c3=_0x3934c3-0x12d;let _0x577058=_0x4555bb[_0x3934c3];return _0x577058;},_0x3934(_0x29e4cb,_0x79309);}loginBtn[_0x5de138(0x13f)](_0x5de138(0x141),()=>{const _0x186e8a=_0x5de138;netlifyIdentity[_0x186e8a(0x142)]();}),logoutBtn['addEventListener']('click',()=>{const _0x23bec4=_0x5de138;netlifyIdentity[_0x23bec4(0x146)]();}),netlifyIdentity['on'](_0x5de138(0x138),_0x2ca486=>{updateUI(_0x2ca486);}),netlifyIdentity['on']('login',_0x239500=>{const _0x4fd7bd=_0x5de138;netlifyIdentity[_0x4fd7bd(0x13a)](),updateUI(_0x239500);}),netlifyIdentity['on'](_0x5de138(0x146),()=>{updateUI(null);});function updateUI(_0x2619b5){const _0x41232b=_0x5de138;_0x2619b5?(dashboard[_0x41232b(0x144)][_0x41232b(0x134)]=_0x41232b(0x13e),logoutBtn[_0x41232b(0x145)][_0x41232b(0x12f)]('hidden'),loginBtn['classList'][_0x41232b(0x136)](_0x41232b(0x131))):(dashboard[_0x41232b(0x144)][_0x41232b(0x134)]=_0x41232b(0x143),logoutBtn[_0x41232b(0x145)][_0x41232b(0x136)](_0x41232b(0x131)),loginBtn[_0x41232b(0x145)][_0x41232b(0x12f)](_0x41232b(0x131)));}
+    netlifyIdentity.init();
+
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const dashboard = document.getElementById("dashboard");
+
+    loginBtn.addEventListener("click", () => {
+      netlifyIdentity.open();
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      netlifyIdentity.logout();
+    });
+
+    netlifyIdentity.on("init", user => {
+      updateUI(user);
+    });
+
+    netlifyIdentity.on("login", user => {
+      netlifyIdentity.close();
+      updateUI(user);
+    });
+
+    netlifyIdentity.on("logout", () => {
+      updateUI(null);
+    });
+
+    function updateUI(user) {
+      if (user) {
+        dashboard.style.display = "block";
+        logoutBtn.classList.remove("hidden");
+        loginBtn.classList.add("hidden");
+      } else {
+        dashboard.style.display = "none";
+        logoutBtn.classList.add("hidden");
+        loginBtn.classList.remove("hidden");
+      }
+    }
