@@ -26,35 +26,18 @@
     </div>
   </div>
 
-  <script>
-    netlifyIdentity.on("init", (user) => {
-      updateUI(user)
-    });
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.location.hash === "#") {
+      history.replaceState(null, "", window.location.pathname);
+    }
 
-    netlifyIdentity.on("login", (user) => {
-      updateUI(user)
-      netlifyIdentity.close()
-      if (window.location.hash === "#") {
-        history.replaceState(null, "", window.location.pathname);
-      }
-    });
-
-    netlifyIdentity.on("logout", () => {
-      updateUI(null)
-    });
-
-    document.getElementById("login-btn").addEventListener("click", () => {
-      netlifyIdentity.open();
-    });
-
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      netlifyIdentity.logout();
-    });
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const greeting = document.getElementById("user-greeting");
 
     function updateUI(user) {
-      const greeting = document.getElementById("user-greeting");
-      const loginBtn = document.getElementById("login-btn");
-      const logoutBtn = document.getElementById("logout-btn");
+      if (!loginBtn || !logoutBtn || !greeting) return;
 
       if (user) {
         greeting.innerHTML = `Welcome, <strong>${user.user_metadata.full_name || user.email}</strong>`;
@@ -67,7 +50,30 @@
       }
     }
 
+    netlifyIdentity.on("init", user => {
+      updateUI(user);
+    });
+
+    netlifyIdentity.on("login", user => {
+      updateUI(user);
+      netlifyIdentity.close();
+    });
+
+    netlifyIdentity.on("logout", () => {
+      updateUI(null);
+    });
+
+    loginBtn?.addEventListener("click", () => {
+      netlifyIdentity.open("login");
+    });
+
+    logoutBtn?.addEventListener("click", () => {
+      netlifyIdentity.logout();
+    });
+
     netlifyIdentity.init();
-  </script>
+  });
+</script>
+
 </body>
 </html>
