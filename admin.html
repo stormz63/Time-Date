@@ -5,137 +5,188 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="style.css">
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import {
-      getFirestore,
-      getDoc,
-      doc,
-      getDocs,
-      collection,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-    import {
-      getDatabase,
-      ref,
-      onValue,
-      remove
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+  <link rel="icon" type="icon" href="/Frontend/Main/Preview.png">
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  import {
+    getFirestore,
+    getDoc,
+    getDocs,
+    doc,
+    collection,
+    updateDoc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+  import {
+    getDatabase,
+    ref,
+    onValue,
+    remove
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
-      authDomain: "timeapp-1b0ec.firebaseapp.com",
-      databaseURL: "https://timeapp-1b0ec-default-rtdb.firebaseio.com",
-      projectId: "timeapp-1b0ec",
-      storageBucket: "timeapp-1b0ec.appspot.com",
-      messagingSenderId: "691836486540",
-      appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
+    authDomain: "timeapp-1b0ec.firebaseapp.com",
+    databaseURL: "https://timeapp-1b0ec-default-rtdb.firebaseio.com",
+    projectId: "timeapp-1b0ec",
+    storageBucket: "timeapp-1b0ec.appspot.com",
+    messagingSenderId: "691836486540",
+    appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const firestore = getFirestore();
-    const db = getDatabase();
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const firestore = getFirestore(app);
+  const db = getDatabase(app);
 
-    window.handleLogin = async function (e) {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  window.handleLogin = async function (e) {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-      try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const userDoc = await getDoc(doc(firestore, "users", cred.user.uid));
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const uid = cred.user.uid;
 
-        if (!userDoc.exists() || !userDoc.data().isAdmin) {
-          alert("Access denied. You are not an admin.");
-          await signOut(auth);
-          return;
-        }
-
-        document.getElementById("loginForm").style.display = "none";
-        document.getElementById("adminPanel").style.display = "block";
-        document.getElementById("adminEmail").textContent = cred.user.email;
-        loadMessages();
-        loadUsers();
-      } catch (err) {
-        alert("Login failed: " + err.message);
+      const userRef = doc(firestore, "users", uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        await setDoc(userRef, { email: email, isAdmin: false, banned: false });
       }
-    };
 
-    async function loadMessages() {
-      const messagesRef = ref(db, 'messages');
-      onValue(messagesRef, snapshot => {
-        const container = document.getElementById("messageList");
-        container.innerHTML = '';
-        const data = snapshot.val();
-        let total = 0;
-        for (let id in data) {
-          total++;
-          const msg = data[id];
-          const div = document.createElement("div");
-          div.innerHTML = `
-            <p><strong>${msg.username}</strong>: ${msg.message}</p>
-            <button onclick="deleteMessage('${id}')">Delete</button>
-            <hr>
-          `;
-          container.appendChild(div);
-        }
-        document.getElementById("totalMessages").textContent = total;
-      });
+      const userData = (await getDoc(userRef)).data();
+      if (!userData.isAdmin) {
+        alert("Access denied. You are not an admin.");
+        await signOut(auth);
+        return;
+      }
+
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+      document.getElementById("adminEmail").textContent = email;
+
+      loadMessages();
+      loadUserList();
+      loadActiveUsers();
+    } catch (err) {
+      alert("Login failed: " + err.message);
     }
+  };
 
-    async function loadUsers() {
-      const snap = await getDocs(collection(firestore, "users"));
-      const container = document.getElementById("userList");
+  async function loadMessages() {
+    const messagesRef = ref(db, 'messages');
+    const container = document.getElementById("messageList");
+    container.innerHTML = "Loading messages...";
+
+    onValue(messagesRef, snapshot => {
       container.innerHTML = '';
-      document.getElementById("totalUsers").textContent = snap.size;
-
-      snap.forEach(docSnap => {
-        const user = docSnap.data();
+      const data = snapshot.val();
+      let total = 0;
+      for (let id in data) {
+        total++;
+        const msg = data[id];
         const div = document.createElement("div");
         div.innerHTML = `
-          <p><strong>${user.email || docSnap.id}</strong></p>
-          <p>Banned: ${user.banned ? 'Yes' : 'No'}</p>
-          <button onclick="toggleBan('${docSnap.id}', ${!user.banned})">
-            ${user.banned ? 'Unban' : 'Ban'} User
-          </button>
+          <p><strong>${msg.username}</strong>: ${msg.message}</p>
+          <button onclick="deleteMessage('${id}')">Delete</button>
           <hr>
         `;
         container.appendChild(div);
-      });
-    }
-
-    window.deleteMessage = function (id) {
-      if (confirm("Delete this message?")) {
-        remove(ref(db, 'messages/' + id));
       }
-    };
+      document.getElementById("totalMessages").textContent = total;
+    });
+  }
 
-    window.toggleBan = async function (uid, status) {
-      await updateDoc(doc(firestore, "users", uid), {
-        banned: status
-      });
-      alert(`User ${status ? 'banned' : 'unbanned'}.`);
-      loadUsers();
-    };
+  async function loadUserList() {
+    const usersContainer = document.getElementById("userList");
+    usersContainer.innerHTML = "Loading users...";
 
-    window.logout = function () {
-      signOut(auth).then(() => location.reload());
-    };
-  </script>
+    const snapshot = await getDocs(collection(firestore, "users"));
+    usersContainer.innerHTML = "";
+    document.getElementById("totalUsers").textContent = snapshot.size;
+
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      const uid = docSnap.id;
+      const email = data.email || "(no email saved)";
+      const banned = data.banned === true;
+
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <p><strong>${email}</strong></p>
+        <p>UID: ${uid}</p>
+        <p>Status: ${banned ? "<span style='color:red;'>BANNED</span>" : "Active"}</p>
+        <button onclick="toggleBan('${uid}', ${banned})">
+          ${banned ? "Unban" : "Ban"}
+        </button>
+        <hr/>
+      `;
+      usersContainer.appendChild(div);
+    });
+  }
+
+  function loadActiveUsers() {
+    const statusRef = ref(db, 'status');
+    const container = document.getElementById("activeUsers");
+    container.innerHTML = "Loading active users...";
+
+    onValue(statusRef, snapshot => {
+      container.innerHTML = '';
+      const data = snapshot.val();
+      if (data) {
+        Object.entries(data).forEach(([uid, info]) => {
+          if (info.state === 'online') {
+            const div = document.createElement('div');
+            div.textContent = `UID: ${uid} is online`;
+            container.appendChild(div);
+          }
+        });
+      } else {
+        container.innerHTML = "No active users currently.";
+      }
+    });
+  }
+
+  window.deleteMessage = function (id) {
+    if (confirm("Delete this message?")) {
+      remove(ref(db, 'messages/' + id));
+    }
+  };
+
+  window.toggleBan = async function(uid, currentlyBanned) {
+    const ref = doc(firestore, "users", uid);
+    await updateDoc(ref, {
+      banned: !currentlyBanned
+    });
+    alert(currentlyBanned ? "User unbanned." : "User banned.");
+    loadUserList();
+  };
+
+  window.logout = function () {
+    signOut(auth).then(() => location.reload());
+  };
+</script>
 </head>
 <body>
+  <header>
+    <h2>Admin Login</h2>
+    <a href="home.html">
+      <button>Home</button>
+    </a>
+  </header>
   <div id="loginForm">
-    <h1>Admin Login</h1>
     <form onsubmit="handleLogin(event)">
-      <input type="email" id="email" placeholder="Email" required /><br />
-      <input type="password" id="password" placeholder="Password" required /><br />
-      <button type="submit">Login</button>
+      <div class="container">
+        <h2>Admin Login</h2>
+        <input type="email" id="email" placeholder="Email" required /><br />
+        <input type="password" id="password" placeholder="Password" required /><br />
+        <button type="submit">Login</button>
+      </div>
     </form>
   </div>
 
@@ -146,6 +197,9 @@
     <h2>Dashboard Stats</h2>
     <p>Total Messages: <span id="totalMessages">0</span></p>
     <p>Total Users: <span id="totalUsers">0</span></p>
+
+    <h2>Active Users</h2>
+    <div id="activeUsers"></div>
 
     <h2>All Messages</h2>
     <div id="messageList"></div>

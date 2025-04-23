@@ -1,39 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="icon" href="/Frontend/Main/Preview.png">
 </head>
 <body>
-    <header>
-        <h2>Contact</h2>
-        <div>
-            <a href="home.html">
-                <button>Home</button>
-            </a>
-        </div>
-    </header>
-
-    <div class="container">
-      <h2>Contact</h2>
-          <form name="contact" netlify>
-        <p>
-          <label>Name <input type="text" name="name" placeholder="Enter your name" required/></label>
-        </p>
-        <p>
-          <label>Email <input type="email" name="email" placeholder="Enter your email" required/></label>
-        </p>
-        <p>
-          <label>Message <input type="text" name="message" class="message-input"></label>
-        </p>
-        <p>
-          <button type="submit">Send</button>
-        </p>
-      </form>
+  <header>
+    <h2>Contact</h2>
+    <div class="nav-buttons">
+      <a href="home.html">
+        <button>Home</button>
+      </a>
     </div>
+  </header>
+
+  <div>
+    <form id="contactForm">
+      <div class="container">
+        <h2>Contact</h2>
+      <div>
+        <input type="text" id="name" placeholder="Name" required>
+      </div>
+      <div>
+        <input type="email" id="email" placeholder="Email" required>
+      </div>
+      <div>
+        <textarea id="message" placeholder="Message"style="border: none; border-radius: 10px; height: 60px; color: black;"></textarea>
+      </div>
+      <button type="submit">Send</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
+      authDomain: "timeapp-1b0ec.firebaseapp.com",
+      databaseURL: "https://timeapp-1b0ec-default-rtdb.firebaseio.com",
+      projectId: "timeapp-1b0ec",
+      storageBucket: "timeapp-1b0ec.appspot.com",
+      messagingSenderId: "691836486540",
+      appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById("contactForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!name || !email || !message) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      push(ref(db, "contactMessages"), {
+        name,
+        email,
+        message,
+        timestamp: Date.now()
+      })
+      .then(() => {
+        alert("Message sent successfully!");
+        document.getElementById("contactForm").reset();
+      })
+      .catch((err) => {
+        alert("Failed to send message: " + err.message);
+        console.error(err);
+      });
+    });
+  </script>
 </body>
 </html>

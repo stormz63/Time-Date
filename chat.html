@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Realtime Chat</title>
+  <title>Chat</title>
+  <link rel="icon" type="icon" href="/Frontend/Main/Preview.png">
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
@@ -40,15 +41,6 @@
       text.className = 'content';
       text.textContent = msg.message;
       div.appendChild(text);
-
-      const delBtn = document.createElement('button');
-      delBtn.textContent = 'Delete';
-      delBtn.onclick = () => {
-        if (confirm("Delete this message?")) {
-          remove(ref(db, 'messages/' + id));
-        }
-      };
-      div.appendChild(delBtn);
 
       return div;
     }
@@ -162,20 +154,6 @@
 
     .content {
       white-space: pre-wrap;
-    }
-
-    .message button {
-      margin-top: 5px;
-      background-color: #e74c3c;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-    }
-
-    .message button:hover {
-      background-color: #c0392b;
     }
 
     header{
