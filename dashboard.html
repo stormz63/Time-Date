@@ -1,12 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      onValue,
+      remove
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
+      authDomain: "timeapp-1b0ec.firebaseapp.com",
+      databaseURL: "https://timeapp-1b0ec-default-rtdb.firebaseio.com",
+      projectId: "timeapp-1b0ec",
+      storageBucket: "timeapp-1b0ec.appspot.com",
+      messagingSenderId: "691836486540",
+      appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getDatabase(app);
+
+    let currentUser;
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      })[tag]);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("You must be logged in to view this page.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+      document.getElementById("email").textContent = user.email;
+      document.getElementById("displayName").textContent = user.displayName || "(no name)";
+      document.getElementById("lastLogin").textContent = new Date(user.metadata.lastSignInTime).toLocaleString();
+
+      loadUserMessages(user.uid);
+    });
+
+    function loadUserMessages(uid) {
+      const messagesRef = ref(db, "messages");
+      onValue(messagesRef, snapshot => {
+        const data = snapshot.val();
+        const container = document.getElementById("userMessages");
+        container.innerHTML = '';
+
+        let count = 0;
+        let firstTimestamp = null;
+
+        for (const [id, msg] of Object.entries(data || {})) {
+          if (msg.uid === uid) {
+            count++;
+            if (!firstTimestamp || msg.timestamp < firstTimestamp) {
+              firstTimestamp = msg.timestamp;
+            }
+
+            const div = document.createElement("div");
+            div.innerHTML = `
+              <strong>${escapeHTML(msg.username)}:</strong><br/>
+              <span>${escapeHTML(msg.message)}</span><br/>
+              <button onclick="deleteMessage('${id}')">Delete</button>
+              <hr/>
+            `;
+            container.appendChild(div);
+          }
+        }
+
+        document.getElementById("messageCount").textContent = count;
+        document.getElementById("firstMessage").textContent = firstTimestamp
+          ? new Date(firstTimestamp).toLocaleString()
+          : "N/A";
+      });
+    }
+
+    window.deleteMessage = function (id) {
+      if (confirm("Delete this message?")) {
+        remove(ref(db, 'messages/' + id));
+      }
+    };
+
+    window.saveName = function () {
+      const newName = document.getElementById("nameInput").value.trim();
+      if (!newName) return alert("Name cannot be empty.");
+
+      updateProfile(auth.currentUser, { displayName: newName })
+        .then(() => {
+          document.getElementById("displayName").textContent = newName;
+          alert("Name updated!");
+        })
+        .catch(err => alert("Error updating name: " + err.message));
+    };
+
+    window.logout = function () {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    };
+  </script>
 </head>
 <body>
     <header>
@@ -18,17 +127,24 @@
         </div>
     </header>
 
-    <div class="container">
-        <div>
-            <button id="login-btn">Login</button>
-            <button id="logout-btn">Logout</button>
-        </div>
+  <p><strong>Email:</strong> <span id="email"></span></p>
+  <p><strong>Display Name:</strong> <span id="displayName"></span></p>
+  <p><strong>Last Login:</strong> <span id="lastLogin"></span></p>
 
-        <div id="dashboard">
-            <h2>Dashboard</h2>
-        </div>
-    </div>
+  <p>
+    <input type="text" id="nameInput" placeholder="New display name" />
+    <button onclick="saveName()">Update Name</button>
+  </p>
 
-    <script src="/Backend/JavaScript/dashboard.js"></script>
+  <hr/>
+
+  <h2>Your Messages</h2>
+  <p><strong>Total:</strong> <span id="messageCount">0</span></p>
+  <p><strong>First Message:</strong> <span id="firstMessage">N/A</span></p>
+
+  <div id="userMessages"></div>
+
+  <hr/>
+  <button onclick="logout()">Logout</button>
 </body>
 </html>
