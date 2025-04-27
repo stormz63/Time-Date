@@ -60,6 +60,7 @@
       <div class="location"><strong>Your Location:</strong> <span id="location"></span></div>
     </div>
 
+
     <div class="container">
       <div>
         <button id="settingsBtn">24 Hour Time</button>
@@ -73,7 +74,45 @@
         <ul id="worldTimes"></ul>
       </div>
     </div>
+      <div class="container">
+        <h2>Moon Phase</h2>
+        <div class="phase"></div>
+      </div>
   </div>
+
+
+
+<script>
+    function getMoonPhase(date) {
+        const lunarCycle = 29.530588853;
+        const knownNewMoon = new Date('2025-04-08');
+        const diffInMs = date - knownNewMoon;
+        const daysSinceNewMoon = diffInMs / (1000 * 60 * 60 * 24);
+        const phase = (daysSinceNewMoon % lunarCycle) / lunarCycle;
+
+        if (phase < 0.03 || phase > 0.97) {
+            return "New Moon";
+        } else if (phase < 0.22) {
+            return "Waxing Crescent";
+        } else if (phase < 0.28) {
+            return "First Quarter";
+        } else if (phase < 0.47) {
+            return "Waxing Gibbous";
+        } else if (phase < 0.53) {
+            return "Full Moon";
+        } else if (phase < 0.72) {
+            return "Waning Gibbous";
+        } else if (phase < 0.78) {
+            return "Last Quarter";
+        } else {
+            return "Waning Crescent";
+        }
+    }
+
+    const today = new Date();
+    const moonPhase = getMoonPhase(today);
+    document.querySelector('.phase').textContent = moonPhase;
+</script>
 
 <script>
   const dateElement = document.getElementById('date');
