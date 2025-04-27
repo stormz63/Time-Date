@@ -11,20 +11,23 @@
     import {
       getAuth,
       createUserWithEmailAndPassword,
-      updateProfile
+      updateProfile,
+      signInWithPopup,
+      GoogleAuthProvider
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD6kIjXk0UKJ5TzKce5ayVAsycR3bcuBiY",
       authDomain: "timeapp-1b0ec.firebaseapp.com",
       projectId: "timeapp-1b0ec",
-      storageBucket: "timeapp-1b0ec.firebasestorage.app",
+      storageBucket: "timeapp-1b0ec.appspot.com",
       messagingSenderId: "691836486540",
       appId: "1:691836486540:web:f8f936597ba21fbecd0ca9"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
+    const provider = new GoogleAuthProvider();
 
     window.handleSignUp = async function (e) {
       e.preventDefault();
@@ -44,6 +47,20 @@
         message.style.color = "#f44336";
       }
     };
+
+    window.handleGoogleSignUp = async function () {
+      const message = document.getElementById("message");
+
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        message.textContent = `Welcome ${user.displayName || "user"}! Account created.`;
+        message.style.color = "#00ffae";
+      } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "#f44336";
+      }
+    };
   </script>
 </head>
 <body>
@@ -55,6 +72,7 @@
       </a>
     </div>
   </header>
+
   <form onsubmit="handleSignUp(event)">
     <div class="container">
       <input type="text" id="username" placeholder="Username" required />
@@ -62,7 +80,17 @@
       <input type="password" id="password" placeholder="Password (min 6 characters)" required />
       <div class="message" id="message"></div>
       <button type="submit">Sign Up</button>
-      <div>
+
+<div style="margin-top: 10px;">
+  <button type="button" onclick="handleGoogleSignUp()" style="background: none; border: none; padding: 0; cursor: pointer;">
+    <img src="https://developers.google.com/identity/images/btn_google_signin_light_normal_web.png" 
+         alt="Sign up with Google" 
+         style="height: 50px;"/>
+  </button>
+</div>
+
+
+      <div style="margin-top: 10px;">
         <label>Already have an account? <a href="login.html">Login</a></label>
       </div>
     </div>
