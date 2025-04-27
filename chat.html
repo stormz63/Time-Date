@@ -23,7 +23,7 @@
     const messagesRef = ref(db, 'messages');
 
     function escapeHTML(str) {
-      return str.replace(/[&<>"']/g, tag => ({
+      return str.replace(/[&<>"]'/g, tag => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
       })[tag]);
     }
@@ -63,17 +63,27 @@
 
     window.handleSubmit = function(e) {
       e.preventDefault();
-      const username = escapeHTML(document.getElementById('username').value.trim());
-      const message = escapeHTML(document.getElementById('message').value.trim());
-      if (!username || !message) return;
+
+      const usernameInput = document.getElementById('username');
+      const messageInput = document.getElementById('message');
+
+      if (!usernameInput || !messageInput) return alert("Form error. Please refresh.");
+
+      const username = escapeHTML(usernameInput.value.trim());
+      const message = escapeHTML(messageInput.value.trim());
+
+      if (!username || !message) return alert("Both fields are required.");
 
       push(messagesRef, {
         username,
         message,
         timestamp: Date.now()
+      }).then(() => {
+        document.getElementById('postForm').reset();
+      }).catch(err => {
+        console.error("Failed to send message:", err);
+        alert("Failed to send message. Check console for error.");
       });
-
-      document.getElementById('postForm').reset();
     };
 
     loadMessages();
@@ -156,27 +166,27 @@
       white-space: pre-wrap;
     }
 
-    header{
-        width: 100%;
-        background-color: #0f2027;
-        padding: 15px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        flex-wrap: wrap;
+    header {
+      width: 100%;
+      background-color: #0f2027;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      flex-wrap: wrap;
     }
   </style>
 </head>
 <body>
-    <header>
-        <h2>Chat Room</h2>
-        <div class="nav-buttons">
-            <a href="home.html">
-                <button>Home</button>
-            </a>
-        </div>
-    </header>
+  <header>
+    <h2>Chat Room</h2>
+    <div class="nav-buttons">
+      <a href="home.html">
+        <button>Home</button>
+      </a>
+    </div>
+  </header>
   <form id="postForm" onsubmit="handleSubmit(event)">
     <input type="text" id="username" placeholder="Enter your name" required />
     <textarea id="message" rows="2" placeholder="Type a message..." required></textarea>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="icon" href="/Frontend/Main/Preview.png">
+</head>
+<body>
+
+  <header>
+    <h2>Weather</h2>
+    <nav>
+      <a href="home.html"><button>Home</button></a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Weather</h2>
+    <br>
+    <div id="weather">
+      <p id="location">Getting weather...</p>
+      <p id="temp"></p>
+      <img id="icon" alt="Weather icon" />
+      <div>
+        <label>
+          <input type="checkbox" id="unitToggle" />
+          Show in °F
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "78f6aadac9b87ff6348d87aeebf6f932";
+    let currentCoords;
+
+    document.getElementById("unitToggle").addEventListener("change", () => {
+      const isFahrenheit = document.getElementById("unitToggle").checked;
+      if (currentCoords) {
+        fetchWeather(currentCoords.lat, currentCoords.lon, isFahrenheit ? "imperial" : "metric");
+      }
+    });
+
+    function fetchWeather(lat, lon, units = "metric") {
+      currentCoords = { lat, lon };
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=${units}`)
+        .then(res => res.json())
+        .then(data => {
+          const unitSymbol = units === "imperial" ? "°F" : "°C";
+          document.getElementById("location").textContent = `${data.name}, ${data.sys.country}`;
+          document.getElementById("temp").textContent = `${data.main.temp}${unitSymbol}, ${data.weather[0].description}`;
+          document.getElementById("icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        })
+        .catch(err => {
+          document.getElementById("location").textContent = "Weather unavailable";
+          console.error(err);
+        });
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        err => {
+          console.warn("Location blocked. Using London as fallback.");
+          fetchWeather(51.5074, -0.1278); // London
+        }
+      );
+    } else {
+      fetchWeather(51.5074, -0.1278); // fallback
+    }
+  </script>
+
+</body>
+</html>
